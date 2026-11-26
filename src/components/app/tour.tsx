@@ -6,12 +6,13 @@ import { ArrowLeft, ArrowRight, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
 /**
- * Visite guidée de la démo : panneau flottant (pas de surimpression bloquante, pas de bibliothèque), 6 étapes.
+ * Visite guidée de la démo : panneau flottant (pas de surimpression bloquante, pas de bibliothèque), 3 étapes.
  * Accessible au clavier (boutons natifs, Échap pour fermer), l'élément expliqué est entouré d'un trait (CSS).
  * Mémorisée en localStorage (avec try/catch : navigation privée ou stockage bloqué sans conséquence).
  * Désactivable : PRIORA_DISABLE_TOUR=true côté serveur, ou « Fermer » (ne revient plus tout seul).
  */
-const STORAGE_KEY = "priora-tour-v1";
+// v2 : visite réduite à 3 étapes, elle se relance une fois chez les visiteurs ayant vu la v1.
+const STORAGE_KEY = "priora-tour-v2";
 export const TOUR_OPEN_EVENT = "priora-tour-open";
 
 interface Step {
@@ -28,35 +29,19 @@ interface Step {
 const STEPS: Step[] = [
   {
     title: "La file est déjà priorisée",
-    body: "Chaque lead reçoit un score sur 100 et un verdict : appeler maintenant, nourrir ou disqualifier. Les plus chauds et les plus anciens remontent en haut, avec le délai de rappel.",
+    body: "Chaque lead a un score sur 100 et un verdict : appeler maintenant, nourrir ou disqualifier. Les plus chauds remontent en haut.",
     href: "/leads",
     target: '[data-tour="queue"]',
   },
   {
-    title: "La fiche lead dit quoi faire",
-    body: "Score détaillé justifié point par point, verdict argumenté, script d'ouverture de 30 secondes, objections probables et questions de découverte.",
+    title: "La fiche dit quoi dire à l'appel",
+    body: "Ouvrez un lead : trois lignes à lire avant de décrocher (accroche, question clé, objection probable). Le score détaillé est juste dessous, à déplier.",
   },
   {
-    title: "Voir en tant que",
-    body: "Changez de poste en un clic : un commercial ne voit que ses leads, le manager pilote, l'admin règle. Les droits sont appliqués côté serveur, pas seulement masqués.",
-    target: '[data-tour="as"]',
-  },
-  {
-    title: "Le tableau de bord du manager",
-    body: "Volume par source, délai médian de premier contact, conversion par tranche de score, classement des commerciaux. Données fictives, calculées comme en production.",
+    title: "Le pilotage du manager",
+    body: "Délai de premier contact, conversion par score, calibration du score sur les ventes réelles. « Voir en tant que » (menu de gauche) change de poste en un clic.",
     href: "/dashboard",
     hint: "Réservé aux postes manager et admin.",
-  },
-  {
-    title: "La calibration : le score se vérifie",
-    body: "Priora compare le score aux ventes réelles : quels critères prédisent vraiment un gain, lesquels n'ont aucun effet. Une suggestion de poids, un aperçu avant et après, un retour arrière possible.",
-    href: "/calibration",
-    hint: "Réservé aux postes manager et admin.",
-  },
-  {
-    title: "À vous de jouer",
-    body: "Déplacez un lead dans le pipeline, créez-en un, changez de poste. Rien n'est partagé avec les autres visiteurs, et le bouton Réinitialiser remet tout à zéro. Le Cas Orus montre une autre configuration.",
-    href: "/pipeline",
   },
 ];
 
@@ -86,7 +71,7 @@ function findVisible(selector: string): HTMLElement | null {
   return null;
 }
 
-export function Tour() {
+export function Tour({ canPilot = true }: { canPilot?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -123,14 +108,15 @@ export function Tour() {
     setStep(n);
     write({ step: n, done: false });
     const s = STEPS[n]!;
-    if (s.href && pathname !== s.href) router.push(s.href);
+    // Le pilotage est réservé au staff : un commercial reste sur place (le texte de l'étape l'indique).
+    if (s.href && pathname !== s.href && (canPilot || s.href !== "/dashboard")) router.push(s.href);
     // Étape « fiche lead » : ouvre le lead le plus prioritaire de la file.
     if (n === 1) {
       const link = findVisible('a[href^="/leads/"]:not([href="/leads/new"]):not([href="/leads/import"])');
       const href = link?.getAttribute("href");
       router.push(href ?? "/leads");
     }
-  }, [pathname, router]);
+  }, [pathname, router, canPilot]);
 
   // Entoure l'élément de l'étape (avec quelques tentatives : la page peut encore être en cours de chargement).
   useEffect(() => {

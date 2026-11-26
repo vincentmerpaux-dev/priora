@@ -1,3 +1,4 @@
+import { CaretRight } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 /** Panneau bordé, sans ombre : l'élévation n'est utilisée que pour les menus et dialogues. */
@@ -33,5 +34,22 @@ export function EmptyState({ title, description, action }: { title: string; desc
       <p className="max-w-[60ch] text-[13px] text-muted">{description}</p>
       {action ? <div className="mt-2">{action}</div> : null}
     </div>
+  );
+}
+
+/**
+ * Section dépliable (details/summary natifs : clavier, lecteur d'écran et focus gérés par le navigateur).
+ * Repliée par défaut : la fiche garde l'essentiel en vue, le détail est à un clic.
+ */
+export function Disclosure({ title, hint, defaultOpen = false, className, children }: { title: string; hint?: string; defaultOpen?: boolean; className?: string; children: React.ReactNode }) {
+  return (
+    <details open={defaultOpen} className={cn("group rounded-[var(--radius)] border border-line bg-surface", className)}>
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-[var(--radius)] px-4 py-3 outline-none hover:bg-surface-2 focus-visible:ring-2 focus-visible:ring-accent [&::-webkit-details-marker]:hidden">
+        <CaretRight className="size-3.5 shrink-0 text-muted transition-transform group-open:rotate-90" aria-hidden />
+        <h2 className="text-[13px] font-semibold tracking-tight">{title}</h2>
+        {hint ? <span className="ml-auto truncate text-[12px] text-muted">{hint}</span> : null}
+      </summary>
+      <div className="border-t border-line">{children}</div>
+    </details>
   );
 }

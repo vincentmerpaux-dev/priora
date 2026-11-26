@@ -11,7 +11,10 @@ const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const out = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "public", "shots");
 await mkdir(out, { recursive: true });
 
+// "lead" ouvre la fiche du lead le plus prioritaire de la file (encadré « À dire à l'appel » en haut).
 const SCREENS = [
+  { name: "leads", path: "/leads" },
+  { name: "lead", path: "first-lead" },
   { name: "calibration", path: "/calibration" },
   { name: "dashboard", path: "/dashboard" },
 ];
@@ -21,12 +24,17 @@ try {
   for (const theme of ["dark", "light"]) {
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, locale: "fr-FR", reducedMotion: "reduce" });
     // Visite guidée déjà « terminée » : elle ne doit pas apparaître sur les captures.
-    await context.addInitScript(() => { try { localStorage.setItem("priora-tour-v1", JSON.stringify({ step: 0, done: true })); } catch { /* ignoré */ } });
+    await context.addInitScript(() => { try { localStorage.setItem("priora-tour-v2", JSON.stringify({ step: 0, done: true })); } catch { /* ignoré */ } });
     await context.addCookies([{ name: "priora-theme", value: theme, url: base }]);
     const page = await context.newPage();
     await page.goto(`${base}/demo/maintia?as=admin`, { waitUntil: "networkidle" });
     for (const s of SCREENS) {
-      await page.goto(`${base}${s.path}`, { waitUntil: "networkidle" });
+      let target = s.path;
+      if (target === "first-lead") {
+        await page.goto(`${base}/leads`, { waitUntil: "networkidle" });
+        target = (await page.locator('a[href^="/leads/"]:not([href="/leads/new"]):not([href="/leads/import"])').first().getAttribute("href")) ?? "/leads";
+      }
+      await page.goto(`${base}${target}`, { waitUntil: "networkidle" });
       await page.waitForTimeout(500);
       const png = await page.screenshot({ type: "png" });
       const file = path.join(out, `${s.name}-${theme}.webp`);

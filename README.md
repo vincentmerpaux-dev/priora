@@ -1,5 +1,52 @@
 # Priora
 
+**Sachez en 10 secondes quel lead appeler, et quoi lui dire.**
+
+[Essayer la démo](https://priora-pink.vercel.app) (sans compte) · [Voir le cas Orus](https://priora-pink.vercel.app/demo/orus) (assurance pro, TPE)
+
+![La file de leads, priorisée par score](public/shots/leads-light.webp)
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/shots/lead-light.webp" alt="Fiche lead avec l'encadré À dire à l'appel"><br><sub>La fiche lead : trois lignes à lire avant de décrocher.</sub></td>
+    <td width="50%"><img src="public/shots/dashboard-light.webp" alt="Tableau de bord du manager"><br><sub>Le pilotage du manager.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="public/shots/calibration-light.webp" alt="Calibration du score sur les ventes réelles"><br><sub>La calibration : le score se vérifie sur les ventes.</sub></td>
+    <td width="50%"><img src="public/shots/lead-dark.webp" alt="Fiche lead en thème sombre"><br><sub>Thème sombre et clair.</sub></td>
+  </tr>
+</table>
+
+## Ce que fait Priora
+
+- **Priorise la file** : chaque lead entrant reçoit un score sur 100, chaque point du score est justifié, et un verdict dit s'il faut appeler maintenant, nourrir ou disqualifier.
+- **Prépare l'appel** : en haut de la fiche, « À dire à l'appel » donne en 3 lignes l'accroche, la question clé et l'objection probable avec sa réponse. Le détail (score, risques, enrichissement) se déplie à la demande.
+- **Enrichit automatiquement** : registre des entreprises (SIREN, effectif, secteur) et lecture du site web, avec repli par règles si l'IA n'est pas disponible.
+- **Pilote l'équipe** : délai de premier contact, conversion par tranche de score, pipeline, attribution des leads, droits par rôle (admin, manager, commercial).
+- **Se calibre** : le score est comparé aux ventes réelles, avec suggestion de poids, aperçu avant et après, et retour arrière possible.
+
+## Stack
+
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Supabase (Postgres, auth, RLS), Vitest, déploiement Vercel. Une démo publique tourne sans Supabase ni clé IA.
+
+## Lancer en local
+
+```bash
+npm install
+npm run dev        # http://localhost:3000, mode démo automatique (données fictives, sans Supabase)
+npm test           # tests unitaires
+```
+
+Détails (variables d'environnement, Supabase, mode démo publique) plus bas.
+
+> **Transparence** : Priora est conçu et piloté par Vincent Merpaux, développé avec des agents IA (Claude Code). Toutes les données de démonstration sont fictives. Le cas Orus est un cas d'étude fondé sur des informations publiques, pas le fonctionnement interne d'Orus.
+
+## Navigation (4 entrées)
+
+Leads, Pipeline, Pilotage (tableau de bord et calibration, en onglets) et Réglages (réglages, équipe et objections, en onglets). Selon le rôle : un commercial ne voit que Leads, Pipeline et Objections ; le manager et l'administrateur voient les quatre entrées. Les anciennes URL (`/dashboard`, `/calibration`, `/team`, `/objections`, `/settings`) fonctionnent toujours et les droits restent appliqués côté serveur. La visite guidée de la démo compte 3 étapes (clé `priora-tour-v2`). Dans la file, seuls la recherche, le délai et le verdict sont visibles ; le reste est sous « Plus de filtres ». Captures : `node scripts/capture-screenshots.mjs` (appli lancée en mode démo).
+
+---
+
 Qualification de leads inbound pour équipes commerciales : les leads entrants sont enrichis, reçoivent un score transparent sur 100, et une fiche d'appel dit s'il faut appeler, quelles objections et quels risques prévoir, et comment ouvrir l'appel. Multi-organisation, configurable.
 
 Étape actuelle : **S4 (vitrine et démo publique)**, au-dessus du MVP S1, de S2 (équipe) et de S3 (intégrations et calibration). Mise en ligne visée : Vercel gratuit, sans Supabase (voir « Déployer sur Vercel en 5 minutes »).
@@ -124,7 +171,7 @@ Limites : le playbook n'est pas persisté côté Supabase (démo uniquement) et 
 
 Parcours de démo en 3 minutes : 1) cliquer "Cas Orus", montrer le bandeau et la file (11 / 9 / 6) ; 2) ouvrir Mathieu Roussel (plaquiste, attestation lundi) : verdict, score détaillé justifié, script d'ouverture ; 3) ses objections et questions de découverte, puis la page Objections ; 4) Pipeline (leads gagnés et perdus), et comparer avec Léa Fournier (compare 3 devis, Nourrir) et Patrick Bellanger (hors cible, Disqualifier).
 
-## Lancer en local
+## Lancer en local (détail)
 
 ```bash
 npm install

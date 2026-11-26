@@ -42,7 +42,7 @@ export default async function SettingsPage() {
     <>
       <PageHeader title="Réglages" description={edit ? "Cible idéale, personas, critères de score, attribution des leads, sources et accès webhook." : "Lecture seule : seuls les administrateurs modifient les réglages."} />
 
-      <nav aria-label="Sections" className="scroll-x mb-5 flex gap-1 overflow-x-auto border-b border-line pb-2 text-[13px]">
+      <nav aria-label="Aller à une section de la page" className="scroll-x mb-5 flex gap-1 overflow-x-auto border-b border-line pb-2 text-[13px]">
         {[["organisation", "Organisation"], ["cible", "Cible, personas, critères"], ["equipe", "Attribution et délais"], ["sources", "Sources"], ["email", "Email entrant"], ["webhook", "Webhook"], ...(manageIntegrations ? [["integrations", "Intégrations"]] : []), ["ia", "IA et légal"]].map(([id, label]) => (
           <a key={id} href={`#${id}`} className="shrink-0 rounded-[var(--radius)] px-3 py-1.5 text-muted hover:bg-surface-2 hover:text-fg">{label}</a>
         ))}

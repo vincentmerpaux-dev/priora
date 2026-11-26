@@ -20,7 +20,7 @@ const context = await browser.newContext({
 });
 // La visite guidée est volontairement désactivée pendant l'enregistrement (elle se montre séparément si besoin).
 await context.addInitScript(() => {
-  try { localStorage.setItem("priora-tour-v1", JSON.stringify({ step: 0, done: true })); } catch { /* ignoré */ }
+  try { localStorage.setItem("priora-tour-v2", JSON.stringify({ step: 0, done: true })); } catch { /* ignoré */ }
   // Curseur visible dans la vidéo : un point qui suit la souris.
   window.addEventListener("DOMContentLoaded", () => {
     const dot = document.createElement("div");
@@ -58,13 +58,20 @@ await page.mouse.wheel(0, 700); await pause(3500);
 
 // 4. Voir en tant que : commercial puis retour admin
 await page.goto(base + "/leads"); await pause(1500);
-await moveClick(page.getByRole("link", { name: /Camille Rousset/ }).first());
+// Le sélecteur « Voir en tant que » est une liste native (visible en barre latérale desktop).
+async function viewAs(pattern) {
+  const select = page.getByLabel("Voir en tant que").first();
+  await select.scrollIntoViewIfNeeded();
+  const label = (await select.locator("option").allTextContents()).find((t) => pattern.test(t));
+  await select.selectOption({ label });
+}
+await viewAs(/Camille Rousset/);
 await page.waitForURL("**/leads"); await pause(4000);
-await moveClick(page.getByRole("link", { name: /Hélène Marchal/ }).first());
+await viewAs(/Hélène Marchal/);
 await page.waitForURL("**/leads"); await pause(1500);
 
 // 5. Tableau de bord puis calibration
-await moveClick(page.getByRole("link", { name: "Tableau de bord" }).first());
+await moveClick(page.getByRole("link", { name: "Pilotage" }).first());
 await page.waitForURL("**/dashboard"); await pause(5000);
 await moveClick(page.getByRole("link", { name: "Calibration" }).first());
 await page.waitForURL("**/calibration"); await pause(4000);

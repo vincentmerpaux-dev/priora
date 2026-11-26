@@ -5,8 +5,9 @@ import { MemberChip } from "@/components/app/member-chip";
 import { SpeedBadge } from "@/components/app/speed";
 import { Buildings, EnvelopeSimple, Globe, Phone, Robot, WarningCircle } from "@/components/icons";
 import { ScoreBar, ScoreNumber, SOURCE_LABEL, Tag } from "@/components/ui/badges";
-import { Panel, PanelHeader } from "@/components/ui/panel";
+import { Disclosure, Panel, PanelHeader } from "@/components/ui/panel";
 import { AI_UNAVAILABLE_NOTICE, aiConfigured } from "@/lib/ai/analyze";
+import { buildCallBrief } from "@/lib/ai/call-brief";
 import { formatDate, formatDateTime, fullName, timeAgo } from "@/lib/format";
 import { verdictLabel } from "@/lib/scoring/engine";
 import { requireOrg } from "@/lib/session";
@@ -64,9 +65,10 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
       <Link href="/leads" className="mb-3 inline-block text-[12px] text-muted hover:text-fg">Retour à la file</Link>
 
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1 basis-[28rem]">
           <h1 className="text-xl font-semibold tracking-tight md:text-2xl">{name}</h1>
           <p className="mt-0.5 text-[13px] text-muted">{[lead.jobTitle, lead.company].filter(Boolean).join(" chez ")}</p>
+          {a ? <CallBriefBox brief={buildCallBrief(a)} /> : null}
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <Tag>{SOURCE_LABEL[lead.source]}{lead.sourceDetail ? ` : ${lead.sourceDetail}` : ""}</Tag>
             <Tag>Reçu {timeAgo(lead.createdAt, now)}</Tag>
@@ -106,8 +108,13 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
           {a ? (
             <>
               <section className={cn("rise rounded-[var(--radius)] border p-4", verdictStyle(a.verdict.decision))} aria-label="Verdict">
-                <p className="text-[11px] font-medium uppercase tracking-wide text-muted">Verdict</p>
-                <p className="mt-1 text-2xl font-semibold tracking-tight">{verdictLabel(a.verdict.decision)}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted">Verdict</p>
+                    <p className="mt-1 text-2xl font-semibold tracking-tight">{verdictLabel(a.verdict.decision)}</p>
+                  </div>
+                  {score ? <p className="flex items-baseline gap-1 text-[12px] text-muted"><ScoreNumber value={score.total} size="md" /> / 100</p> : null}
+                </div>
                 <p className="mt-1 max-w-[65ch] text-[14px]">{a.verdict.reason}</p>
               </section>
 
@@ -121,28 +128,25 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
                 {writable ? <ReanalyzeButton leadId={lead.id} aiAvailable={aiConfigured()} /> : null}
               </div>
 
-              <Panel>
-                <PanelHeader title="Résumé et besoin probable" />
+              <Disclosure title="Résumé et besoin probable">
                 <div className="flex flex-col gap-3 p-4 text-[14px]">
                   <p>{a.summary}</p>
                   <p className="text-muted"><span className="font-medium text-fg">Besoin probable : </span>{a.probableNeed}</p>
                 </div>
-              </Panel>
+              </Disclosure>
 
               {a.persona ? (
-                <Panel>
-                  <PanelHeader title="Persona le plus proche" />
+                <Disclosure title="Persona le plus proche" hint={a.persona.name}>
                   <PersonaBlock persona={a.persona} detail={personas.find((x) => x.name === a.persona?.name)} />
-                </Panel>
+                </Disclosure>
               ) : null}
 
-              <Panel>
-                <PanelHeader title="Script d'ouverture (30 secondes)" action={<CopyButton text={a.openingScript} />} />
+              <Disclosure title="Script d'ouverture (30 secondes)">
                 <p className="p-4 text-[14px] leading-relaxed">{a.openingScript}</p>
-              </Panel>
+                <div className="border-t border-line px-4 py-2"><CopyButton text={a.openingScript} /></div>
+              </Disclosure>
 
-              <Panel>
-                <PanelHeader title="Objections probables" />
+              <Disclosure title="Objections probables" hint={String(a.objections.length)}>
                 <ul className="divide-y divide-line">
                   {a.objections.map((o, i) => (
                     <li key={i} className="p-4">
@@ -154,10 +158,9 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
                     </li>
                   ))}
                 </ul>
-              </Panel>
+              </Disclosure>
 
-              <Panel>
-                <PanelHeader title="Risques" />
+              <Disclosure title="Risques" hint={String(a.risks.length)}>
                 <ul className="grid divide-y divide-line sm:grid-cols-2 sm:divide-y-0">
                   {a.risks.map((r, i) => (
                     <li key={i} className={cn("p-4", i % 2 === 1 && "sm:border-l sm:border-line", i > 1 && "sm:border-t sm:border-line")}>
@@ -169,16 +172,15 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
                     </li>
                   ))}
                 </ul>
-              </Panel>
+              </Disclosure>
 
-              <Panel>
-                <PanelHeader title="Questions de découverte" />
+              <Disclosure title="Questions de découverte" hint={String(a.discoveryQuestions.length)}>
                 <ol className="flex flex-col gap-2.5 p-4 text-[14px]">
                   {a.discoveryQuestions.map((q, i) => (
                     <li key={i} className="grid grid-cols-[1.5rem_1fr] gap-1"><span className="num text-muted">{i + 1}.</span><span>{q}</span></li>
                   ))}
                 </ol>
-              </Panel>
+              </Disclosure>
             </>
           ) : (
             <Panel className="p-5">
@@ -214,8 +216,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
             </div>
           </Panel>
 
-          <Panel>
-            <PanelHeader title="Score détaillé" />
+          <Disclosure title="Score détaillé" hint={score ? `${score.total} / 100` : undefined}>
             {score ? (
               <div className="p-4">
                 <div className="flex items-end gap-2">
@@ -248,10 +249,9 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
             ) : (
               <p className="p-4 text-[13px] text-muted">Score non calculé.</p>
             )}
-          </Panel>
+          </Disclosure>
 
-          <Panel>
-            <PanelHeader title="Enrichissement" />
+          <Disclosure title="Enrichissement" hint={company?.legalName}>
             <div className="flex flex-col gap-3 p-4 text-[13px]">
               {company ? (
                 <dl className="grid grid-cols-[6.5rem_1fr] gap-x-3 gap-y-2">
@@ -279,7 +279,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
               ) : null}
               {!lead.enrichment ? <p className="text-muted">Aucun enrichissement effectué.</p> : null}
             </div>
-          </Panel>
+          </Disclosure>
 
           <Panel>
             <PanelHeader title="Contact" />
@@ -311,6 +311,28 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
         </aside>
       </div>
     </>
+  );
+}
+
+/** « À dire à l'appel » : trois lignes lues avant de décrocher, tirées de l'analyse. */
+function CallBriefBox({ brief }: { brief: ReturnType<typeof buildCallBrief> }) {
+  const rows: { label: string; main: string; sub?: string }[] = [
+    { label: "Accroche", main: brief.hook },
+    { label: "Question clé", main: brief.question },
+    ...(brief.objection ? [{ label: "Objection probable", main: `« ${brief.objection.objection} »`, sub: brief.objection.answer }] : []),
+  ].filter((r) => r.main);
+  return (
+    <section aria-labelledby="a-dire" className="mt-3 rounded-[var(--radius)] border border-accent-line bg-accent-soft p-4">
+      <h2 id="a-dire" className="text-[11px] font-medium uppercase tracking-wide text-muted">À dire à l&apos;appel</h2>
+      <ol className="mt-2 flex flex-col gap-2 text-[14px]">
+        {rows.map((r, i) => (
+          <li key={r.label} className="grid grid-cols-[1.25rem_1fr] gap-1.5">
+            <span className="num text-muted">{i + 1}.</span>
+            <span><span className="font-semibold">{r.label} : </span>{r.main}{r.sub ? <span className="text-muted"> Réponse : {r.sub}</span> : null}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
