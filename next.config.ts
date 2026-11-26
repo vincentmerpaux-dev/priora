@@ -40,6 +40,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Permet forbidden() (403) dans les pages réservées à certains rôles.
   experimental: { authInterrupts: true },
+  // Adresses déduites du menu (Pilotage, Réglages et ses onglets) : renvoyées vers les vraies pages.
+  async redirects() {
+    return [
+      { source: "/pilotage", destination: "/dashboard", permanent: false },
+      { source: "/reglages", destination: "/settings", permanent: false },
+      { source: "/settings/team", destination: "/team", permanent: false },
+      { source: "/settings/objections", destination: "/objections", permanent: false },
+    ];
+  },
   async headers() {
     return [
       // Tout le produit refuse d'être intégré dans une iframe...

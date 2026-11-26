@@ -10,7 +10,7 @@ export default function NotFound() {
       <div aria-hidden className="grid-bg absolute inset-0 -z-10 opacity-50" />
       <header className="px-6 py-5"><Link href="/" aria-label="Priora, accueil"><Logo /></Link></header>
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-3 px-6 pb-24">
-        <p className="num text-sm text-warn">404 · lead introuvable</p>
+        <p className="num text-sm text-warn">404 · page introuvable</p>
         <h1 className="text-3xl font-semibold leading-tight tracking-tight">Cette page n&apos;existe pas, ou plus.</h1>
         <p className="text-muted">Le lien est peut-être erroné, ou la démo a été réinitialisée entre-temps. Rien de grave : repartez de l&apos;accueil.</p>
         <div className="mt-2 flex flex-wrap gap-3">
