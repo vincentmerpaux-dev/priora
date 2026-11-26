@@ -1,0 +1,29 @@
+# Vérifie toutes les 5 minutes les leads "Appeler maintenant" en retard et crée les notifications.
+# Gratuit sur un dépôt public. GitHub peut retarder les exécutions planifiées de quelques minutes.
+# Secrets à créer (Settings > Secrets and variables > Actions) :
+#   PRIORA_URL   : adresse publique de l'application, sans barre finale (ex. https://priora.example.com)
+#   CRON_SECRET  : la même valeur que la variable d'environnement CRON_SECRET de l'application
+name: speed-check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  speed-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Appeler /api/cron/speed-check
+        env:
+          PRIORA_URL: ${{ secrets.PRIORA_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          # Démo publique (sans base réelle) : secrets absents, la tâche ne fait rien et ne signale pas d'échec.
+          if [ -z "$PRIORA_URL" ] || [ -z "$CRON_SECRET" ]; then echo "Secrets absents : tâche ignorée."; exit 0; fi
+          curl --fail --silent --show-error --max-time 60 \
+            -X POST "$PRIORA_URL/api/cron/speed-check" \
+            -H "Authorization: Bearer $CRON_SECRET"

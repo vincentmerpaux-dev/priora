@@ -1,0 +1,72 @@
+/*
+ * Design tokens, direction "Terminal nocturne".
+ * Fichier autonome : il est conçu pour être réutilisé tel quel dans un autre projet (ex. Vigie).
+ * Thème sombre par défaut, thème clair via [data-theme="light"].
+ *
+ * Règle de forme (unique) : contrôles et panneaux = --radius (6px), étiquettes = --radius-sm (4px).
+ */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0b0d10;
+  --surface: #14171c;
+  --surface-2: #1a1e25;
+  --surface-3: #222730;
+  --border: #252a33;
+  --border-strong: #343b47;
+
+  --fg: #e6e8eb;
+  --muted: #8f98a6;
+  --faint: #8a94a4;
+
+  --accent: #3dd68c;
+  --accent-fg: #04140c;
+  --accent-soft: rgb(61 214 140 / 0.12);
+  --accent-line: rgb(61 214 140 / 0.35);
+
+  --warn: #f5a524;
+  --warn-soft: rgb(245 165 36 / 0.13);
+  --danger: #f2555a;
+  --danger-soft: rgb(242 85 90 / 0.13);
+
+  --focus: #3dd68c;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.6);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --surface-3: #e6e9ee;
+  --border: #dde1e7;
+  --border-strong: #c3c9d2;
+
+  --fg: #14171c;
+  --muted: #566070;
+  --faint: #5f6876;
+
+  --accent: #0a8a4f;
+  --accent-fg: #ffffff;
+  --accent-soft: rgb(10 138 79 / 0.1);
+  --accent-line: rgb(10 138 79 / 0.35);
+
+  --warn: #a35f00;
+  --warn-soft: rgb(163 95 0 / 0.11);
+  --danger: #c4343a;
+  --danger-soft: rgb(196 52 58 / 0.1);
+
+  --focus: #0a8a4f;
+  --shadow: 0 1px 0 rgb(20 23 28 / 0.04), 0 12px 28px -14px rgb(20 23 28 / 0.25);
+}
+
+:root {
+  --radius: 6px;
+  --radius-sm: 4px;
+  --font-sans: "Inter Tight Variable", "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
