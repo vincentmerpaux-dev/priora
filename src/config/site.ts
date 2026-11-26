@@ -17,7 +17,7 @@ export const SITE = {
     /** PLACEHOLDER : URL complète du dépôt GitHub du projet ou de votre profil (https://github.com/...). */
     github: "https://github.com/vincentmerpaux-dev",
     /** PLACEHOLDER : adresse email de contact (elle sera publique sur la page). */
-    email: "vincent.merpaux@gmail.com",
+    email: "vincent.merpaux@hotmail.fr",
   },
   /** Ligne discrète pour les recruteurs techniques. */
   stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "Supabase (Postgres, RLS)", "Vitest"],
